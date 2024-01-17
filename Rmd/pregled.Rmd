@@ -23,22 +23,17 @@ hotel$arrival_date_month <- match(hotel$arrival_date_month, names(month_mapping)
 
 hotel$arrival_date <- as.Date(paste(hotel$arrival_date_year, hotel$arrival_date_month, hotel$arrival_date_day_of_month, sep = "-"))
 
-
-hotel$reservation_status_date <- as.Date(hotel$reservation_status_date, format = "%d-%m-%y")
-hotel$reservation_status_date <- format(hotel$reservation_status_date, "%Y-%m-%d")
-hotel$reservation_status_date <- as.Date(hotel$reservation_status_date)
-
 hotel$arrival_date_year <- NULL
 hotel$arrival_date_month <- NULL
 hotel$arrival_date_day_of_month <- NULL
+
+hotel$reservation_status_date <- as.Date(hotel$reservation_status_date, format = "%d-%m-%y")
 
 glimpse(hotel)
 
 sum(hotel$is_repeated_guest)
 unique(hotel$is_repeated_guest)
 table(hotel$days_in_waiting_list)
-
-glimpse(books)
 
 ```
 
