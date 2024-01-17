@@ -35,5 +35,7 @@ sum(hotel$is_repeated_guest)
 unique(hotel$is_repeated_guest)
 table(hotel$days_in_waiting_list)
 
+#proba
+
 ```
 
