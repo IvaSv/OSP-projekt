@@ -1,13 +1,21 @@
 -----------------------------------------------------------------------------------------------------------------------
 Hoteli:
 
+Iva
 Posjećenost kroz godine. Koja godina je najviša posjećenost?
+Istraživanje sezonskih varijacija u rezervacijama tijekom godine. (Kroz jednu najpopularniju i najnepopularniju godinu statistika po mjesecima.)
+Iz koje države dolazi najviše gostiju kroz godine?
+
+
+Filip
 Koliko ranije gost rezervira smještaj?
 Koliko često gosti otkazuju rezervaciju?
-Istraživanje sezonskih varijacija u rezervacijama tijekom godine. (Kroz jednu najpopularniju i najnepopularniju godinu statistika po mjesecima.)
+Identifikacija najpopularnijih tipova soba ili paketa.
+
+
+Altea
 Dolaze li više ljudi s djecom ili samci?
 Tip sobe za goste s djecom ili bez?
 Koji gosti dolaze više autima (s djecom ili bez)?
-Iz koje države dolazi najviše gostiju kroz godine?
 Analiziranje prosječnog vremena boravka gostiju.
-Identifikacija najpopularnijih tipova soba ili paketa.
+
