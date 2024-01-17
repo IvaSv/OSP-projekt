@@ -1,0 +1,44 @@
+---
+title: "pregled"
+author: "1349136962 FILIP MIŠKOVIĆ"
+date: "2024-01-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+```{r}
+hotel <- read_csv("../data/Hotel bookings/hotel_bookings.csv")
+hotel
+
+# Ako nemate numerički ekvivalent za sve mjesece, možete koristiti ovu mapu
+month_mapping <- c("January" = 1, "February" = 2, "March" = 3, "April" = 4, "May" = 5, "June" = 6, "July" = 7, "August" = 8, "September" = 9, "October" = 10, "November" = 11, "December" = 12)
+
+# Koristite funkciju match da biste dobili numeričke ekvivalente
+hotel$arrival_date_month <- match(hotel$arrival_date_month, names(month_mapping))
+
+hotel$arrival_date <- as.Date(paste(hotel$arrival_date_year, hotel$arrival_date_month, hotel$arrival_date_day_of_month, sep = "-"))
+
+
+hotel$reservation_status_date <- as.Date(hotel$reservation_status_date, format = "%d-%m-%y")
+hotel$reservation_status_date <- format(hotel$reservation_status_date, "%Y-%m-%d")
+hotel$reservation_status_date <- as.Date(hotel$reservation_status_date)
+
+hotel$arrival_date_year <- NULL
+hotel$arrival_date_month <- NULL
+hotel$arrival_date_day_of_month <- NULL
+
+glimpse(hotel)
+
+sum(hotel$is_repeated_guest)
+unique(hotel$is_repeated_guest)
+table(hotel$days_in_waiting_list)
+
+glimpse(books)
+
+```
+
