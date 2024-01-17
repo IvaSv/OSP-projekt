@@ -37,5 +37,33 @@ table(hotel$days_in_waiting_list)
 
 #proba
 
+hotel
+
+```
+```{r}
+#Altea
+#Dolaze li više ljudi s djecom ili bez djece?
+glimpse(hotel)
+
+bezDjece <- hotel[(hotel$adults > 0) & (hotel$children==0), ]
+sDjecom <- hotel[(hotel$adults > 0) & (hotel$children>0), ]
+
+ggplot() +
+  geom_bar(data = sDjecom, aes(x = "S djecom", fill = "S djecom")) +
+  geom_bar(data = bezDjece, aes(x = "Bez djece", fill ="Bez djece")) +
+  labs(title = "Analiza gostiju - dolasci s djecom naspram bez djece") +
+  scale_fill_brewer(palette = "Dark2", name="Legenda") 
+  
+
+
+#Tip sobe za goste s djecom ili bez?
+
+
+#Koji gosti dolaze više autima (s djecom ili bez)?
+
+
+#Analiziranje prosječnog vremena boravka gostiju.
+
+
 ```
 
