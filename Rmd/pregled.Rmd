@@ -109,3 +109,127 @@ ggplot() +
 
 ```
 
+
+
+#IVA
+```{r}
+hotel <- read_csv("../data/Hotel bookings/hotel_bookings.csv")
+hotel
+head(hotel, 15)
+
+#Posjećenost kroz godine. Koja godina je najviša posjećenost? 
+
+#datumi po godini 
+table(hotel$arrival_date_year) 
+
+#ne uzimamo u obzir one koji su otkazali
+hotel_filtriran <- hotel %>% filter(is_canceled == 0)
+
+#datumi po godini - hotel filtriran
+table(hotel_filtriran$arrival_date_year)
+
+#koristiti arrival_date_year (SORRY FILIP, IPAK TREBA!)
+godisnja_statistika <- hotel_filtriran %>% group_by(arrival_date_year) %>% summarise(visits = n()) 
+
+
+ggplot(godisnja_statistika, aes(x = as.factor(arrival_date_year), y = visits, fill = as.factor(arrival_date_year))) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Accent") +
+  labs(title = "Godišnja posjećenost",
+       x = "Godina",
+       y = "Broj posjeta") +
+  theme_minimal() +
+  guides(fill = guide_legend(title = "Godine"))
+
+
+
+#Koje godine je bilo najvise otkazanih rezervacija?
+otkazane_rezevracije <- table(hotel$arrival_date_year) - table(hotel_filtriran$arrival_date_year)
+otkazane_rezervacije_df <- data.frame(godina = names(otkazane_rezevracije), otkazane_rezevracije = as.numeric(otkazane_rezevracije))
+otkazane_rezervacije_df
+
+ggplot(otkazane_rezervacije_df, aes(x = godina, y = otkazane_rezevracije, fill = godina)) +
+  geom_bar(stat = "identity") +
+  scale_fill_brewer(palette = "Paired") +
+  labs(title = "Broj otkazanih rezervacija na godišnjoj razini",
+       x = "",
+       y = "Broj otkazanih rezervacija") +
+  theme_minimal() + 
+  guides(fill = guide_legend(title = "Godine"))
+
+#Istraživanje sezonskih varijacija u rezervacijama tijekom godine. (Kroz jednu najpopularniju i najnepopularniju godinu statistika po mjesecima.)
+
+#Izdvajanje godine i mjeseca
+hotel_filtriran
+hotel_godisnje_doba <- hotel_filtriran %>%  
+  mutate(godisnje_doba = case_when(arrival_date_month %in% 3:5 ~ "Proljeće",
+                                   arrival_date_month %in% 6:8 ~ "Ljeto",
+                                   arrival_date_month %in% 9:11 ~ "Jesen",
+                                   TRUE ~ "Zima"))
+
+# Filtriranje podataka za najpopularniju i najmanje popularnu godinu
+najpopularnija_godina <- hotel_godisnje_doba %>%
+  group_by(arrival_date_year) %>%
+  summarise(broj_rezervacija = n()) %>%
+  filter(broj_rezervacija == max(broj_rezervacija)) %>%
+  pull(arrival_date_year)
+
+najnepopularnija_godina <- hotel_godisnje_doba %>%
+  group_by(arrival_date_year) %>%
+  summarise(broj_rezervacija = n()) %>%
+  filter(broj_rezervacija == min(broj_rezervacija)) %>%
+  pull(arrival_date_year)
+
+# Filtrirajte podatke za najpopularniju godinu
+najpopularnija_godisnja_statistika <- hotel_godisnje_doba %>%
+  filter(arrival_date_year == najpopularnija_godina)
+
+# Filtrirajte podatke za najnepopularniju godinu
+najnepopularnija_godisnja_statistika <- hotel_godisnje_doba %>%
+  filter(arrival_date_year == najnepopularnija_godina)
+
+
+# ggplot  za najpopularniju godinu
+ggplot(najpopularnija_godisnja_statistika, aes(x = arrival_date_month, fill = godisnje_doba)) +
+  geom_bar(position = "stack") +
+  labs(title = paste("Sezonske varijacije u najpopularnijoj godini:", najpopularnija_godina),
+       x = "Mjesec",
+       y = "Broj rezervacija") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() + 
+  guides(fill = guide_legend(title = "Godišnje doba"))
+
+# ggplot  za najpopularniju godinu
+ggplot(najnepopularnija_godisnja_statistika, aes(x = arrival_date_month, fill = godisnje_doba)) +
+  geom_bar(position = "stack") +
+  labs(title = paste("Sezonske varijacije u najnepopularnijoj godini:", najnepopularnija_godina),
+       x = "Mjesec",
+       y = "Broj rezervacija") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() + 
+   guides(fill = guide_legend(title = "Godišnje doba"))
+
+
+#Iz koje države dolazi najviše gostiju po godine? --FIX THIS, NOW WORKING
+# top 10 država prema broju posjetitelja
+top_countries <- hotel_filtriran
+  group_by(country) %>%
+  summarise(visit_count = n()) %>%
+  top_n(10, wt = visit_count)
+
+ggplot(top_countries, aes(x = fct_reorder(country, visit_count), y = visit_count, fill = country)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 10 Visitor Countries",
+       x = "Country",
+       y = "Number of Visitors") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal()
+
+
+
+
+
+
+```
+
+
