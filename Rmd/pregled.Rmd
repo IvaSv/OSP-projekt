@@ -67,3 +67,45 @@ ggplot() +
 
 ```
 
+```{r}
+# Filipove škrabotine
+
+# Koliko ranije gost rezervira smještaj?
+hotel
+lead_time <- data.frame(NumOfDays = as.numeric(names(table(hotel$lead_time))), Frequency = as.numeric(table(hotel$lead_time)))
+lead_time
+ggplot(lead_time, aes(x = NumOfDays, y = Frequency)) + 
+  geom_freqpoly(stat = "identity") +
+  labs(title = "Vrijeme rezerviranja prije dolaska", x = "Broj dana", y = "Broj gostiju")
+
+
+# Koliko često gosti otkazuju rezervaciju?
+hotel[hotel$is_canceled == 1, ]
+checkOut <- hotel[hotel$reservation_status == "Check-Out", c("reservation_status", "reservation_status_date", "arrival_date")]
+checkOut
+
+ggplot(hotel, aes(x = "", fill = reservation_status)) +
+  geom_bar(color = "white", position = "fill") +
+  labs(x = "Statusi rezervacija", y = "Omjer", fill = "Status") +
+  theme(aspect.ratio = 2/1)
+
+# Identifikacija najpopularnijih tipova soba ili paketa.
+# ima 10 tipova soba!
+table(hotel$reserved_room_type)
+
+ggplot(hotel, aes(x = "", fill = reserved_room_type)) +
+  geom_bar(color = "white", position = "fill") +
+  labs(x = "Tip sobe")
+
+
+# Odnos ispunjenih i neispinjenih zahtjeva gostiju
+ispunjeniZahtjevi <- hotel[hotel$reserved_room_type == hotel$assigned_room_type, c("reserved_room_type", "assigned_room_type")]
+neispunjeniZahtjevi <- hotel[hotel$reserved_room_type != hotel$assigned_room_type, c("reserved_room_type", "assigned_room_type")]
+
+ggplot() +
+  geom_bar(data = ispunjeniZahtjevi, aes(x = "Ispunjeni zahtjevi", fill = "Ispunjeni zahtjevi")) +
+  geom_bar(data = neispunjeniZahtjevi, aes(x = "Neispunjeni zahtjevi", fill = "Neispunjeni zahtjevi")) +
+  labs(title = "Odnos ispunjenih i neispunjenih zahtjeva gostiju", x = "Zahtjevi gostiju", y = "Broj zahtjeva", fill = "Legenda")
+
+```
+
