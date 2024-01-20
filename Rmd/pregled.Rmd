@@ -270,9 +270,8 @@ hotel
 head(hotel, 15)
 
 #Posjećenost kroz godine. Koja godina je najviša posjećenost? 
-
 #datumi po godini 
-table(hotel$arrival_date_year) 
+table(hotel$arrival_date_year)  
 
 #ne uzimamo u obzir one koji su otkazali
 hotel_filtriran <- hotel %>% filter(is_canceled == 0)
@@ -283,7 +282,6 @@ table(hotel_filtriran$arrival_date_year)
 #koristiti arrival_date_year (SORRY FILIP, IPAK TREBA!)
 godisnja_statistika <- hotel_filtriran %>% group_by(arrival_date_year) %>% summarise(visits = n()) 
 
-
 ggplot(godisnja_statistika, aes(x = as.factor(arrival_date_year), y = visits, fill = as.factor(arrival_date_year))) +
   geom_bar(stat = "identity") +
   scale_fill_brewer(palette = "Accent") +
@@ -293,13 +291,10 @@ ggplot(godisnja_statistika, aes(x = as.factor(arrival_date_year), y = visits, fi
   theme_minimal() +
   guides(fill = guide_legend(title = "Godine"))
 
-
-
 #Koje godine je bilo najvise otkazanih rezervacija?
 otkazane_rezevracije <- table(hotel$arrival_date_year) - table(hotel_filtriran$arrival_date_year)
 otkazane_rezervacije_df <- data.frame(godina = names(otkazane_rezevracije), otkazane_rezevracije = as.numeric(otkazane_rezevracije))
 otkazane_rezervacije_df
-
 ggplot(otkazane_rezervacije_df, aes(x = godina, y = otkazane_rezevracije, fill = godina)) +
   geom_bar(stat = "identity") +
   scale_fill_brewer(palette = "Paired") +
@@ -309,15 +304,22 @@ ggplot(otkazane_rezervacije_df, aes(x = godina, y = otkazane_rezevracije, fill =
   theme_minimal() + 
   guides(fill = guide_legend(title = "Godine"))
 
+table(hotel$arrival_date_year)
+table(hotel_filtriran$arrival_date_year)
+
 #Istraživanje sezonskih varijacija u rezervacijama tijekom godine. (Kroz jednu najpopularniju i najnepopularniju godinu statistika po mjesecima.)
 
 #Izdvajanje godine i mjeseca
 hotel_filtriran
+table(hotel_filtriran$arrival_date_month)
 hotel_godisnje_doba <- hotel_filtriran %>%  
-  mutate(godisnje_doba = case_when(arrival_date_month %in% 3:5 ~ "Proljeće",
-                                   arrival_date_month %in% 6:8 ~ "Ljeto",
-                                   arrival_date_month %in% 9:11 ~ "Jesen",
-                                   TRUE ~ "Zima"))
+  mutate(godisnje_doba = case_when(
+    arrival_date_month  %in% c("March", "April", "May") ~ "Proljeće",
+    arrival_date_month %in% c("June", "July", "August") ~ "Ljeto",
+    arrival_date_month %in% c("September", "October", "November") ~ "Jesen",
+    arrival_date_month %in% c("December", "January", "February") ~ "Zima"
+  ))
+
 
 # Filtriranje podataka za najpopularniju i najmanje popularnu godinu
 najpopularnija_godina <- hotel_godisnje_doba %>%
@@ -335,47 +337,87 @@ najnepopularnija_godina <- hotel_godisnje_doba %>%
 # Filtrirajte podatke za najpopularniju godinu
 najpopularnija_godisnja_statistika <- hotel_godisnje_doba %>%
   filter(arrival_date_year == najpopularnija_godina)
+najpopularnija_godisnja_statistika$arrival_date_month <- factor(
+  najpopularnija_godisnja_statistika$arrival_date_month,
+  levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"),
+  ordered = TRUE
+)
 
 # Filtrirajte podatke za najnepopularniju godinu
+
 najnepopularnija_godisnja_statistika <- hotel_godisnje_doba %>%
   filter(arrival_date_year == najnepopularnija_godina)
 
+najnepopularnija_godisnja_statistika <- hotel_godisnje_doba %>%
+  mutate(Broj_rezervacija = ifelse(arrival_date_year == najnepopularnija_godina, 1, 0))
+
+
+table(najnepopularnija_godisnja_statistika$arrival_date_month)
+
+najnepopularnija_godisnja_statistika$arrival_date_month <- factor(
+  najnepopularnija_godisnja_statistika$arrival_date_month,
+  levels = c("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"),
+  ordered = TRUE
+)
+
+hrvatski_mjeseci <- c("Sij", "Velj", "Ožu", "Tra", "Svi", "Lip", "Srp", "Kol", "Ruj", "Lis", "Stu", "Pros")
+
 
 # ggplot  za najpopularniju godinu
-ggplot(najpopularnija_godisnja_statistika, aes(x = arrival_date_month, fill = godisnje_doba)) +
+ggplot(najpopularnija_godisnja_statistika, aes(x = as.factor(as.numeric(factor(arrival_date_month))), fill = godisnje_doba)) +
   geom_bar(position = "stack") +
   labs(title = paste("Sezonske varijacije u najpopularnijoj godini:", najpopularnija_godina),
        x = "Mjesec",
        y = "Broj rezervacija") +
   scale_fill_brewer(palette = "Set3") +
   theme_minimal() + 
-  guides(fill = guide_legend(title = "Godišnje doba"))
+  guides(fill = guide_legend(title = "Godišnje doba")) +
+  scale_x_discrete(labels = hrvatski_mjeseci)  
 
-# ggplot  za najpopularniju godinu
-ggplot(najnepopularnija_godisnja_statistika, aes(x = arrival_date_month, fill = godisnje_doba)) +
+
+# ggplot  za nanejpopularniju godinu
+ggplot(najnepopularnija_godisnja_statistika, aes(x = as.factor(as.numeric(factor(arrival_date_month))), fill = godisnje_doba)) +
   geom_bar(position = "stack") +
+  labs(title = paste("Sezonske varijacije u najpopularnijoj godini:", najpopularnija_godina),
+       x = "Mjesec",
+       y = "Broj rezervacija") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() + 
+  guides(fill = guide_legend(title = "Godišnje doba")) +
+  scale_x_discrete(labels = 1:12)  
+
+ggplot(najnepopularnija_godisnja_statistika, aes(x = arrival_date_month, y = Broj_rezervacija, fill = godisnje_doba)) +
+  geom_bar(position = "stack", stat = "identity") +
   labs(title = paste("Sezonske varijacije u najnepopularnijoj godini:", najnepopularnija_godina),
        x = "Mjesec",
        y = "Broj rezervacija") +
   scale_fill_brewer(palette = "Set3") +
   theme_minimal() + 
-   guides(fill = guide_legend(title = "Godišnje doba"))
+  guides(fill = guide_legend(title = "Godišnje doba")) + 
+  scale_x_discrete(labels = hrvatski_mjeseci)
 
 
-#Iz koje države dolazi najviše gostiju po godine? --FIX THIS, NOW WORKING
+
+
+#Iz koje države dolazi najviše gostiju po godinama?
 # top 10 država prema broju posjetitelja
-top_countries <- hotel_filtriran
-  group_by(country) %>%
-  summarise(visit_count = n()) %>%
-  top_n(10, wt = visit_count)
+  
+visits_by_country <- table(hotel_filtriran$country)
+visits_by_country <- as.data.frame(visits_by_country)
+visits_by_country_sorted <-visits_by_country[order(-visits_by_country$Freq),]
+top_ten_countries <- head(visits_by_country_sorted, 10)
+top_ten_countries
 
-ggplot(top_countries, aes(x = fct_reorder(country, visit_count), y = visit_count, fill = country)) +
+ggplot(top_ten_countries, aes(x = reorder(Var1, -Freq), y = Freq)) +
   geom_bar(stat = "identity") +
-  labs(title = "Top 10 Visitor Countries",
-       x = "Country",
-       y = "Number of Visitors") +
-  scale_fill_brewer(palette = "Set3") +
-  theme_minimal()
+  labs(title = "Prvih 10 država prema broju posjetitelja",
+       x = "Država",
+       y = "Broj posjetitelja") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+
+ggsave("../figures/najnepopularnija.png")
+
 
 
 
