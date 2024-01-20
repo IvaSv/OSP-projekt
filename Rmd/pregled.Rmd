@@ -54,21 +54,21 @@ bezDjece <- hotel[(hotel$adults > 0) & (hotel$children==0) & (hotel$babies==0), 
 sDjecom <- hotel[(hotel$adults > 0) & ((hotel$children>0) | (hotel$babies>0)), ]
 samoDjeca <- hotel[(hotel$adults == 0) & (hotel$children>0), ] #spomeni kao zanimljivost
 
-ggplot() +
-  geom_bar(data = sDjecom, aes(x = "Odrasli s djecom", fill = "Odrasli s djecom")) +
-  geom_bar(data = bezDjece, aes(x = "Odrasli bez djece", fill ="Odrasli bez djece")) +
-  labs(title = "Analiza gostiju - dolasci s djecom/bez djece", x=NULL, y=NULL) +
-  scale_fill_brewer(palette = "Set1", name=NULL) + theme_minimal()
+#ggplot() +
+#  geom_bar(data = sDjecom, aes(x = "Odrasli s djecom", fill = "Odrasli s djecom")) +
+#  geom_bar(data = bezDjece, aes(x = "Odrasli bez djece", fill ="Odrasli bez djece")) +
+#  labs(title = "Analiza gostiju - dolasci s djecom/bez djece", x=NULL, y=NULL) +
+#  scale_fill_brewer(palette = "Set1", name=NULL) + theme_minimal()
 
-sum(((hotel$children != 0) | (hotel$babies != 0)) & hotel$adults>0, na.rm=T) #9109 dolaze s djecom
-sum((hotel$children == 0) & (hotel$babies == 0) & (hotel$adults>0), na.rm=T) #109874 dolaze bez djece
-sum(hotel$adults==0 & (hotel$babies>0 | hotel$children>0), na.rm=T) #223 ???
+#sum(((hotel$children != 0) | (hotel$babies != 0)) & hotel$adults>0, na.rm=T) #9109 dolaze s djecom
+#sum((hotel$children == 0) & (hotel$babies == 0) & (hotel$adults>0), na.rm=T) #109874 dolaze bez djece
+#sum(hotel$adults==0 & (hotel$babies>0 | hotel$children>0), na.rm=T) #223 ???
 
 table(hotel$adults)
 hotel[hotel$adults == 0 & hotel$is_canceled==0 & (hotel$babies>0 | hotel$children>0), ]
 
 #rade pie chart!
-dff2 <- data.frame(group = c("Odrasli s djecom", "Samo odrasli"), 
+dff2 <- data.frame(group = c("Odrasli s djecom", "Odrasli"), 
       value=c(nrow(sDjecom), nrow(bezDjece)))
 dff2
 
@@ -104,30 +104,30 @@ table(sDjecom2$reserved_room_type) #L i P nema
 
 #3.Koji gosti dolaze više autima (s djecom ili bez)?
 
-sDjecomAutom <- hotel[hotel$adults>0 & ((hotel$children >0) | (hotel$babies>0)) & hotel$required_car_parking_spaces>0, ]
+#sDjecomAutom <- hotel[hotel$adults>0 & ((hotel$children >0) | (hotel$babies>0)) & hotel$required_car_parking_spaces>0, ]
 
-bezDjeceAutom <- hotel[hotel$adults>0 & ((hotel$children ==0) & (hotel$babies==0)) & hotel$required_car_parking_spaces>00, ]
+#bezDjeceAutom <- hotel[hotel$adults>0 & ((hotel$children ==0) & (hotel$babies==0)) & hotel$required_car_parking_spaces>00, ]
 
-ggplot() + 
-  geom_bar(data=bezDjeceAutom, aes(x="Dolazak autom bez djece",fill="Dolazak autom bez djece")) +
-  geom_bar(data=sDjecomAutom, aes(x="Dolazak autom s djecom", fill="Dolazak autom s djecom")) +
-  labs(title = "Analiza gostiju - dolasci s djecom/bez djece autom", x=NULL, y=NULL) +
-  scale_fill_brewer(palette = "Set1", name=NULL) +
-  scale_y_continuous(name="rezervacije")
+#ggplot() + 
+#  geom_bar(data=bezDjeceAutom, aes(x="Dolazak autom bez djece",fill="Dolazak autom bez #"djece")) +
+#  geom_bar(data=sDjecomAutom, aes(x="Dolazak autom s djecom", fill="Dolazak autom s djecom")) +
+#  labs(title = "Analiza gostiju - dolasci s djecom/bez djece autom", x=NULL, y=NULL) +
+#  scale_fill_brewer(palette = "Set1", name=NULL) +
+#  scale_y_continuous(name="rezervacije")
 
 #izmjena: opcenito potraznja za parking mjestom - ima vise smisla
 trebaParking <- hotel[hotel$required_car_parking_spaces != 0, ]
 neTrebaParking <- hotel[hotel$required_car_parking_spaces == 0, ]
 
-ggplot() + geom_bar(data=trebaParking, aes(x="Dolazak autom", fill="Dolazak autom")) +
-  geom_bar(data=neTrebaParking, aes(x="Nije potrebno parkirno mjesto", fill="Nije potrebno parkirno mjesto")) +
-  labs(title = "Analiza gostiju - potreba za parkirnim mjestom", x=NULL, y=NULL) +
-  scale_fill_brewer(palette = "Set1", name=NULL) +
-  scale_y_continuous(name="rezervacije")
+#ggplot() + geom_bar(data=trebaParking, aes(x="Dolazak autom", fill="Dolazak autom")) +
+#  geom_bar(data=neTrebaParking, aes(x="Nije potrebno parkirno mjesto", fill="Nije potrebno parkirno mjesto")) +
+#  labs(title = "Analiza gostiju - potreba za parkirnim mjestom", x=NULL, y=NULL) +
+#  scale_fill_brewer(palette = "Set1", name=NULL) +
+#  scale_y_continuous(name="rezervacije")
 
 #ovdje!!
 
-dff <- data.frame(group = c("Zahtijeva parking", "Nije potreban"), 
+dff <- data.frame(group = c("Potreban parking", "Nije potreban parking"), 
       value=c(nrow(trebaParking), nrow(neTrebaParking)))
 
 ggplot(dff, aes(x="", y=value, fill=group)) +
