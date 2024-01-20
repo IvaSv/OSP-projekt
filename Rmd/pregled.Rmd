@@ -177,33 +177,87 @@ ggplot(lead_time, aes(x = NumOfDays, y = Frequency)) +
   labs(title = "Vrijeme rezerviranja prije dolaska", x = "Broj dana", y = "Broj gostiju")
 
 
+
 # Koliko često gosti otkazuju rezervaciju?
 hotel[hotel$is_canceled == 1, ]
-checkOut <- hotel[hotel$reservation_status == "Check-Out", c("reservation_status", "reservation_status_date", "arrival_date")]
+canceled <- hotel[hotel$reservation_status == "Canceled", ]
+canceled
+checkOut <- hotel[hotel$reservation_status == "Check-Out", ]
 checkOut
+noShow <- hotel[hotel$reservation_status == "No-Show", ]
+noShow
 
-ggplot(hotel, aes(x = "", fill = reservation_status)) +
-  geom_bar(color = "white", position = "fill") +
-  labs(x = "Statusi rezervacija", y = "Omjer", fill = "Status") +
-  theme(aspect.ratio = 2/1)
+reservation_status_PC <- data.frame(group = c("Otkazano", "Odlazak", "Nedolazak"), 
+      value=c(nrow(canceled), nrow(checkOut), nrow(noShow)))
+reservation_status_PC
+
+ggplot(reservation_status_PC, aes(x = "", y = value, fill = group)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(round(value/nrow(hotel), 2) * 100, "%")), position = position_stack(vjust = 0.5)) +
+  labs(title = "Analiza rezervacija - odnos među statusima rezervacija", x = NULL, y = NULL) +
+  scale_fill_brewer(palette = "Set2", name = "Status rezervacije")
+
 
 # Identifikacija najpopularnijih tipova soba ili paketa.
 # ima 10 tipova soba!
 table(hotel$reserved_room_type)
 
-ggplot(hotel, aes(x = "", fill = reserved_room_type)) +
-  geom_bar(color = "white", position = "fill") +
-  labs(x = "Tip sobe")
+tipA <- hotel[hotel$reserved_room_type == "A", ]
+tipB <- hotel[hotel$reserved_room_type == "B", ]
+tipC <- hotel[hotel$reserved_room_type == "C", ]
+tipD <- hotel[hotel$reserved_room_type == "D", ]
+tipE <- hotel[hotel$reserved_room_type == "E", ]
+tipF <- hotel[hotel$reserved_room_type == "F", ]
+tipG <- hotel[hotel$reserved_room_type == "G", ]
+tipH <- hotel[hotel$reserved_room_type == "H", ]
+tipL <- hotel[hotel$reserved_room_type == "L", ]
+tipP <- hotel[hotel$reserved_room_type == "P", ]
+
+nrow(tipA) + nrow(tipB) + nrow(tipC) + nrow(tipD) + nrow(tipE) + nrow(tipF) + nrow(tipG) + nrow(tipH) + nrow(tipL) + nrow(tipP)
+
+tipovi_soba_PC <- data.frame(group = c("A", "B", "C", "D", "E", "F", "G", "H", "L", "P"), 
+                             value = c(nrow(tipA), nrow(tipB), nrow(tipC), nrow(tipD), nrow(tipE), nrow(tipF), nrow(tipG), nrow(tipH), nrow(tipL), nrow(tipP)))
+
+# postoji 5 soba kojima je postotak zastupljenosti veći od 1% pa ćemo uzeti te, ostale ćemo samo u izvještaju nabrojati da postoje i da je njihova zastupljenost manja od 1%
+sorted_tipovi_soba_PC <- arrange(tipovi_soba_PC, desc(value))
+sorted_tipovi_soba_PC
+lapply(sorted_tipovi_soba_PC$value, function(x) {
+  x / nrow(hotel) * 100
+}) %>% unlist
 
 
-# Odnos ispunjenih i neispinjenih zahtjeva gostiju
-ispunjeniZahtjevi <- hotel[hotel$reserved_room_type == hotel$assigned_room_type, c("reserved_room_type", "assigned_room_type")]
-neispunjeniZahtjevi <- hotel[hotel$reserved_room_type != hotel$assigned_room_type, c("reserved_room_type", "assigned_room_type")]
+reduced_tipovi_soba_PC <- sorted_tipovi_soba_PC[sorted_tipovi_soba_PC$value / nrow(hotel) * 100 >= 1, ]
+reduced_tipovi_soba_PC
 
-ggplot() +
-  geom_bar(data = ispunjeniZahtjevi, aes(x = "Ispunjeni zahtjevi", fill = "Ispunjeni zahtjevi")) +
-  geom_bar(data = neispunjeniZahtjevi, aes(x = "Neispunjeni zahtjevi", fill = "Neispunjeni zahtjevi")) +
-  labs(title = "Odnos ispunjenih i neispunjenih zahtjeva gostiju", x = "Zahtjevi gostiju", y = "Broj zahtjeva", fill = "Legenda")
+ggplot(reduced_tipovi_soba_PC, aes(x = "", y = value, fill = group)) +
+  geom_bar(stat = "identity", width = 1) + 
+  #coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(round(value / nrow(hotel), 2) * 100, "%")), position = position_stack(vjust = 0.5)) +
+  labs(title = "Najpopularnije sobe", x = NULL, y = NULL) +
+  scale_fill_brewer(palette = "Set2", name = "Tip sobe")
+
+
+# Odnos ispunjenih i neispunjenih zahtjeva gostiju
+ispunjeniZahtjevi <- hotel[hotel$reserved_room_type == hotel$assigned_room_type, ]
+ispunjeniZahtjevi
+neispunjeniZahtjevi <- hotel[hotel$reserved_room_type != hotel$assigned_room_type, ]
+neispunjeniZahtjevi
+
+zahtjevi_PC <- data.frame(group = c("Ispunjeni zahtjevi", "Neispunjeni zahtjevi"),
+                          value = c(nrow(ispunjeniZahtjevi), nrow(neispunjeniZahtjevi)))
+zahtjevi_PC
+
+ggplot(zahtjevi_PC, aes(x = "", y = value, fill = group)) + 
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0) +
+  geom_text(aes(label = paste0(round(value/nrow(hotel), 2) * 100, "%")), position = position_stack(vjust = 0.5)) +
+  labs(title = "Odnos ispunjenih i neispunjenih zahtjeva gostiju", x = NULL, y = NULL) + 
+  scale_fill_brewer(palette = "Set2", name = "Vrsta zahtjeva")
+
+
+# ggsave("../figures/najpopularnije_sobe.png")
+
 
 ```
 
