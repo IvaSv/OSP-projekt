@@ -77,7 +77,9 @@ ggplot(dff2, aes(x="", y=value, fill=group)) +
   coord_polar("y", start=0) +
   geom_text(aes(label = paste0(round(value/nrow(hotel),2)*100, "%")), position = position_stack(vjust=0.5)) +
   labs(title = "Analiza gostiju - dolasci s djecom/bez djece", x=NULL, y=NULL) +
-  scale_fill_brewer(palette="Set2", name="Gosti")
+  scale_fill_brewer(palette="Set2", name="Gosti") + 
+  theme_minimal() 
+
 
 
 
@@ -96,7 +98,10 @@ sDjecom2 <- sDjecom[!is.na(sDjecom$reserved_room_type), ]
 ggplot(sDjecom2, aes(x = "", fill = reserved_room_type)) +
   geom_bar(color = "white", position = "fill") +
   labs(x = NULL, title="Analiza gostiju - tip sobe za goste s djecom", y=NULL) +
-  scale_fill_brewer(name="Tip sobe", palette = "Set2")
+  scale_fill_brewer(name="Tip sobe", palette = "Set2") +
+  theme_minimal()
+
+
 
 table(hotel$reserved_room_type)
 table(sDjecom2$reserved_room_type) #L i P nema
@@ -135,7 +140,10 @@ ggplot(dff, aes(x="", y=value, fill=group)) +
   coord_polar("y", start=0) +
   geom_text(aes(label = paste0(round(value/nrow(hotel),2)*100, "%")), position = position_stack(vjust=0.5)) +
   labs(title = "Analiza gostiju - potreba za parkirnim mjestom", x=NULL, y=NULL) +
-  scale_fill_brewer(palette="Set2", name="Parking")
+  scale_fill_brewer(palette="Set2", name="Parking") + 
+  theme_minimal()
+
+
   
   
   table(hotel$required_car_parking_spaces)
@@ -157,10 +165,13 @@ table(hotel$ukupno_nocenja) #min 0, max 69
 
 ggplot(hotel, aes(x=as.factor(ukupno_nocenja))) + geom_bar() +
   scale_y_log10(name="rezervacije") +
-  labs(title="Analiza gostiju - raspodjela broja noćenja", x="broj noćenja")
+  labs(title="Analiza gostiju - raspodjela broja noćenja", x="broj noćenja") + 
+  theme_minimal()
 
 #na x osi predstavljene su sve vrijednosti bookinarnih noćenja, kako ide od 1 ovi koji nemaju
 #pripadni bar su 1
+
+ggsave("../figures/nocenja.png")
 
 
 ```
@@ -174,7 +185,9 @@ lead_time <- data.frame(NumOfDays = as.numeric(names(table(hotel$lead_time))), F
 lead_time
 ggplot(lead_time, aes(x = NumOfDays, y = Frequency)) + 
   geom_freqpoly(stat = "identity") +
-  labs(title = "Vrijeme rezerviranja prije dolaska", x = "Broj dana", y = "Broj gostiju")
+  labs(title = "Vrijeme rezerviranja prije dolaska", x = "Broj dana", y = "Broj gostiju") + theme_minimal()
+
+
 
 
 
@@ -196,7 +209,9 @@ ggplot(reservation_status_PC, aes(x = "", y = value, fill = group)) +
   coord_polar("y", start = 0) +
   geom_text(aes(label = paste0(round(value/nrow(hotel), 2) * 100, "%")), position = position_stack(vjust = 0.5)) +
   labs(title = "Analiza rezervacija - odnos među statusima rezervacija", x = NULL, y = NULL) +
-  scale_fill_brewer(palette = "Set2", name = "Status rezervacije")
+  scale_fill_brewer(palette = "Set2", name = "Status rezervacije") + 
+  theme_minimal()
+
 
 
 # Identifikacija najpopularnijih tipova soba ili paketa.
@@ -235,7 +250,10 @@ ggplot(reduced_tipovi_soba_PC, aes(x = "", y = value, fill = group)) +
   #coord_polar("y", start = 0) +
   geom_text(aes(label = paste0(round(value / nrow(hotel), 2) * 100, "%")), position = position_stack(vjust = 0.5)) +
   labs(title = "Najpopularnije sobe", x = NULL, y = NULL) +
-  scale_fill_brewer(palette = "Set2", name = "Tip sobe")
+  scale_fill_brewer(palette = "Set2", name = "Tip sobe") + 
+  theme_minimal()
+
+
 
 
 # Odnos ispunjenih i neispunjenih zahtjeva gostiju
@@ -253,7 +271,10 @@ ggplot(zahtjevi_PC, aes(x = "", y = value, fill = group)) +
   coord_polar("y", start = 0) +
   geom_text(aes(label = paste0(round(value/nrow(hotel), 2) * 100, "%")), position = position_stack(vjust = 0.5)) +
   labs(title = "Odnos ispunjenih i neispunjenih zahtjeva gostiju", x = NULL, y = NULL) + 
-  scale_fill_brewer(palette = "Set2", name = "Vrsta zahtjeva")
+  scale_fill_brewer(palette = "Set2", name = "Vrsta zahtjeva") + 
+  theme_minimal()
+
+ggsave("../figures/zahtjevi.png")
 
 
 # ggsave("../figures/najpopularnije_sobe.png")
@@ -413,10 +434,11 @@ ggplot(top_ten_countries, aes(x = reorder(Var1, -Freq), y = Freq)) +
   labs(title = "Prvih 10 država prema broju posjetitelja",
        x = "Država",
        y = "Broj posjetitelja") +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() 
 
 
-ggsave("../figures/najnepopularnija.png")
+ggsave("../figures/topdesetdrzava.png")
 
 
 
